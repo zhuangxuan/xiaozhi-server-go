@@ -10,4 +10,5 @@ wake_replay
 /uploads
 .env
 config.db
+car-relay.db
 /ota_bin

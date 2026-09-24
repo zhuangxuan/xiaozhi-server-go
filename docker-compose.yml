@@ -14,3 +14,16 @@ services:
       - DATABASE_URL=sqlite://./config.db
       - ENV=production
       - PORT=8080
+  car-relay:
+    build:
+      context: .
+      dockerfile: car-relay/Dockerfile
+    container_name: car-relay
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - car-relay-data:/data
+
+volumes:
+  car-relay-data:
