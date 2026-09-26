@@ -7,11 +7,13 @@ RUN CGO_ENABLED=1 go build -o /out/car-relay ./car-relay
 
 FROM debian:bookworm-slim
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates \
+    && apt-get install -y --no-install-recommends ca-certificates curl \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --system --uid 65532 --create-home car
-WORKDIR /data
+    && useradd --system --uid 65532 --create-home car \
+    && mkdir -p /data \
+    && chown car:car /data
 COPY --from=build /out/car-relay /usr/local/bin/car-relay
-USER car
+COPY car-relay/docker-entrypoint.sh /usr/local/bin/car-relay-entrypoint
+RUN chmod 755 /usr/local/bin/car-relay-entrypoint
 EXPOSE 8090
-ENTRYPOINT ["car-relay", "-addr", ":8090", "-db", "/data/car-relay.db"]
+ENTRYPOINT ["car-relay-entrypoint"]

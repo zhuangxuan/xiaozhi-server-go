@@ -1,12 +1,16 @@
+# 默认只启动遥控后端：docker compose up -d --build
+# 语音服务需要本机已有的 linux 程序，另开：docker compose --profile voice up -d
+
 services:
   app:
+    profiles: ["voice"]
     image: ghcr.io/animeaichat/xiaozhi-server-go:server
     container_name: xiaozhi-server
     restart: unless-stopped
     volumes:
       - .:/app
     working_dir: /app
-    command: ["./linux-amd64-server-upx"] #修改成程序文件名
+    command: ["./linux-amd64-server-upx"]
     ports:
       - "8080:8080"
       - "8000:8000"
@@ -24,6 +28,12 @@ services:
       - "8090:8090"
     volumes:
       - car-relay-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8090/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
 volumes:
   car-relay-data:
